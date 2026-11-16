@@ -1,0 +1,37 @@
+# AuditKIT formalization config — Lexsi triage baseline (concept #1)
+#
+# PURPOSE: on Monday, the harness results in results/ are formalized into
+# the AuditKIT audit record (the shared record the entry publishes).
+# The harness's own scoring.py is the primary scorer; AuditKIT is the
+# record/comparison layer (ak.compare for before vs after, RunResult
+# fingerprints, ExperimentDB).
+#
+# VERIFIED from AuditKIT's README (github.com/Lexsi-Labs/AuditKIT, read
+# 2026-11-08): `import auditkit as ak`; ak.Sample(input=..., target=...);
+# ak.evaluate(samples, model=...) where model is a "list[str] -> list[str]"
+# callable OR a backend string like "hf:CohereLabs/aya-expanse-8b";
+# ak.compare(base, tuned); pip install auditkit / auditkit[transformers];
+# CLI subcommands: eval, init, list, redteam, compare, agent.
+#
+# VERIFIED 2026-11-13 against auditkit 1.1.11 (pip install auditkit):
+#   * agent_eval API wired and proven end-to-end in formalize_auditkit.py
+#     (104/104 echo-smoke cases completed; verdicts match scoring.py).
+#     Path: episode_from_openai_messages(messages, case_id=, source_id=)
+#     -> AgentCase(allowed_tools=TOOL_NAMES, reference_turns in
+#     {name, arguments} form — AuditKIT's normalize_call does NOT accept
+#     our {tool, arguments} shape — outcome=CustomPredicate(fn, version,
+#     name) deferring to scoring.score_item) -> AgentEvalSpec(mode=
+#     "recorded", scorers=["tool_call_f1", "tool_call_validity"])
+#     -> AgentEvalRunner().run(spec) -> AgentEvalResult (rows carry
+#     verdict + diagnostics). Assistant messages must ALSO carry OpenAI
+#     `tool_calls` for the f1/validity scorers (formalize script enriches).
+#   * This YAML remains a human-readable spec of the record; the runnable
+#     formalization is formalize_auditkit.py, not `auditkit eval`.
+
+model: "hf:CohereLabs/aya-expanse-8b"   # verified Cohere id; swap for Tiny Aya id once verified on HF
+dataset: "../triage-tasks.jsonl"        # scored by baseline/scoring.py; AuditKIT record wraps the same run
+tags: ["lexsi", "track3", "triage-baseline", "before"]
+notes: >
+  Baseline (before) run for concept #1. The after run reuses this file
+  with the fine-tuned adapter as the model, and ak.compare(base, tuned)
+  produces the before/after record the submission publishes.

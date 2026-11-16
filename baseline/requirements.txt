@@ -1,0 +1,8 @@
+# Lexsi triage baseline — Monday GPU environment (Colab free tier or HF credits)
+# Core harness (toolspec/scoring/run_baseline) is stdlib-only.
+# The lines below are only for the transformers backend + AuditKIT record.
+auditkit[transformers]>=1.1.2
+transformers>=4.46
+torch>=2.3
+accelerate>=0.34
+bitsandbytes>=0.43  # load_in_8bit (baseline T4 route) + 4-bit QLoRA (finetune)
